@@ -5,9 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  *
  */
@@ -15,17 +12,17 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "questionoptions")
+@Table(name = "question_options")
 public class QuestionOption {
     /**
      *
      */
     @Id
-    @Column(name = "questionoption_id")
+    @Column(name = "question_option_id")
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    public Long questionoptionId;
+    public Long questionOptionId;
 
     /**
      * Question parente
