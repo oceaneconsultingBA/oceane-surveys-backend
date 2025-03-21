@@ -50,7 +50,7 @@ public class Question {
      * Indique si la réponse est obligatoire
      */
     @Column(name = "required", nullable = false)
-    public Boolean required;
+    public boolean required;
 
     /**
      * Ordre d'affichage dans l'enquête
