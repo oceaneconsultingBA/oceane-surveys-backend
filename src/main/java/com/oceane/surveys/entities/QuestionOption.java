@@ -30,12 +30,9 @@ public class QuestionOption {
     /**
      * Question parente
      */
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "question_questionoption",
-            joinColumns = @JoinColumn(name = "questionoption_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id"))
-    private Set<Question> questions = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(name = "question_id")
+    private Question question;
 
     /**
      *  Texte de l'option
