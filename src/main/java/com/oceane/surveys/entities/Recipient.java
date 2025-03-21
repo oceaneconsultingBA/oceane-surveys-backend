@@ -36,14 +36,14 @@ public class Recipient {
     /**
      * Prénom
      */
-    @Column(name = "firstname")
-    public String firstname;
+    @Column(name = "first_name")
+    public String firstName;
 
     /**
      * Nom
      */
-    @Column(name = "lastname")
-    public String lastname;
+    @Column(name = "last_name")
+    public String lastName;
 
     /**
      * Entreprise ou client
