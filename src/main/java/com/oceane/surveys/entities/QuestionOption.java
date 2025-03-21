@@ -3,19 +3,25 @@ package com.oceane.surveys.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  */
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "QUESTIONOPTION")
+@Table(name = "questionoptions")
 public class QuestionOption {
     /**
      *
      */
     @Id
+    @Column(name = "questionoption_id")
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
@@ -24,18 +30,22 @@ public class QuestionOption {
     /**
      * Question parente
      */
-    @Column(name = "QUESTION_ID")
-    public Long questionId;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "question_questionoption",
+            joinColumns = @JoinColumn(name = "questionoption_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id"))
+    private Set<Question> questions = new HashSet<>();
 
     /**
      *  Texte de l'option
      */
-    @Column(name = "TEXT")
+    @Column(name = "text")
     public String text;
 
     /**
      * Ordre d'affichage dans la liste des options
      */
-    @Column(name = "DISPLAYORDER")
-    public Long displayOrder;
+    @Column(name = "display_order", nullable = false)
+    public int displayOrder;
 }
