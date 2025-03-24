@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface RecipientRepository extends JpaRepository<Recipient, Long> {
     Optional<Recipient> findByEmail(String email);
     List<Recipient> findByType(RecipientType type);
-    List<Recipient> findBySurveysId(String surveysId);
+    List<Recipient> findBySurveysId(Long surveysId);
     boolean existsByEmail(String email);
 }
