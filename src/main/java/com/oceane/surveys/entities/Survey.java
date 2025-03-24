@@ -64,13 +64,13 @@ public class Survey {
     /**
      * Questions associées
      */
-    @OneToMany(mappedBy = "surveys", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Survey> questions = new ArrayList<>();
+    @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Question> questions = new ArrayList<>();
 
     /**
      * Personnes
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "survey_recipients",
             joinColumns = @JoinColumn(name = "survey_id"),

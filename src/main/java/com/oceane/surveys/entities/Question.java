@@ -55,8 +55,8 @@ public class Question {
     /**
      * Ordre d'affichage dans l'enquête
      */
-    @Column(name = "display_order", nullable = false)
-    public int displayOrder;
+    @Column(name = "display_order")
+    public Integer displayOrder;
 
     /**
      * Logique conditionnelle d'affichage (format JSON, optionnel)
@@ -67,6 +67,6 @@ public class Question {
     /**
      * Options de réponse (pour questions à choix)
      */
-    @OneToMany(mappedBy = "questions", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionOption> options = new ArrayList<>();
 }
