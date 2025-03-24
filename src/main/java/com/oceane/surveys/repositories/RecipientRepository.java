@@ -2,12 +2,16 @@ package com.oceane.surveys.repositories;
 
 import com.oceane.surveys.entities.Recipient;
 import com.oceane.surveys.entities.RecipientType;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface RecipientRepository extends CrudRepository<Recipient, Long> {
-    List<Recipient> findByEmail(String email);
+@Repository
+public interface RecipientRepository extends JpaRepository<Recipient, Long> {
+    Optional<Recipient> findByEmail(String email);
     List<Recipient> findByType(RecipientType type);
     List<Recipient> findBySurveysId(String surveysId);
+    boolean existsByEmail(String email);
 }
