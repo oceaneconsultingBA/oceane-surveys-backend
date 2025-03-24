@@ -62,9 +62,5 @@ public class Recipient {
      * Enquête associée à la personne
      */
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "survey_recipients",
-            joinColumns = @JoinColumn(name = "recipient_id"),
-            inverseJoinColumns = @JoinColumn(name = "survey_id"))
     private Set<Survey> surveys = new HashSet<>();
 }
