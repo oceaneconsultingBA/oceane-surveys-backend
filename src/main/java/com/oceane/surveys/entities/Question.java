@@ -24,7 +24,7 @@ public class Question {
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    public Long questionId;
+    private Long questionId;
 
     /**
      * Enquête parente
@@ -37,32 +37,32 @@ public class Question {
      * Libellé de la question
      */
     @Column(name = "text", nullable = false)
-    public String text;
+    private String text;
 
     /**
      * Type de question
      */
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    public QuestionType type;
+    private QuestionType type;
 
     /**
      * Indique si la réponse est obligatoire
      */
     @Column(name = "required", nullable = false)
-    public boolean required;
+    private boolean required;
 
     /**
      * Ordre d'affichage dans l'enquête
      */
     @Column(name = "display_order")
-    public Integer displayOrder;
+    private Integer displayOrder;
 
     /**
      * Logique conditionnelle d'affichage (format JSON, optionnel)
      */
     @Column(name = "conditional_logic", columnDefinition = "TEXT")
-    public String conditionalLogic;
+    private String conditionalLogic;
 
     /**
      * Options de réponse (pour questions à choix)
