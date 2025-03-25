@@ -28,38 +28,38 @@ public class Survey {
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    public Long surveyId;
+    private Long surveyId;
 
     /**
      * Titre de l'enquête
      */
     @Column(name = "title", nullable = false)
-    public String title;
+    private String title;
 
     /**
      * Description détaillée
      */
     @Column(name = "description", length = 1000)
-    public String description;
+    private String description;
 
     /**
      * Date de création
      */
     @Column(name = "creation_date", nullable = false)
-    public LocalDateTime creationDate;
+    private LocalDateTime creationDate;
 
     /**
      * Date de dernière modification
      */
     @Column(name = "last_modified_date")
-    public LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     /**
      * Statut de l'enquête
      */
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    public SurveyStatus status;
+    private SurveyStatus status;
 
     /**
      * Questions associées
