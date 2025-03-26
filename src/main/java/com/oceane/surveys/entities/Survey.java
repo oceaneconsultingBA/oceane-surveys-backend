@@ -77,4 +77,29 @@ public class Survey {
             inverseJoinColumns = @JoinColumn(name = "recipient_id")
     )
     private Set<Recipient> recipients = new HashSet<>();
+
+    // Helper methods
+    public void addQuestion(Question question) {
+        questions.add(question);
+        question.setSurvey(this);
+    }
+
+    public void removeQuestion(Question question) {
+        questions.remove(question);
+        question.setSurvey(null);
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        creationDate = LocalDateTime.now();
+        lastModifiedDate = LocalDateTime.now();
+        if (status == null) {
+            status = SurveyStatus.DRAFT;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        lastModifiedDate = LocalDateTime.now();
+    }
 }
