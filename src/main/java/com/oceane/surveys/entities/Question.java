@@ -69,4 +69,15 @@ public class Question {
      */
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionOption> options = new ArrayList<>();
+
+    // Helper methods
+    public void addOption(QuestionOption option) {
+        options.add(option);
+        option.setQuestion(this);
+    }
+
+    public void removeOption(QuestionOption option) {
+        options.remove(option);
+        option.setQuestion(null);
+    }
 }
