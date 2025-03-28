@@ -1,10 +1,12 @@
 package com.oceane.surveys.services;
 
 import com.oceane.surveys.dto.RecipientDTO;
-import com.oceane.surveys.dto.SurveyDTO;
 import com.oceane.surveys.entities.Recipient;
+import com.oceane.surveys.entities.Survey;
+import com.oceane.surveys.exception.ResourceNotFoundException;
 import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.repositories.RecipientRepository;
+import com.oceane.surveys.repositories.SurveyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,13 +17,13 @@ import java.util.List;
 public class RecipientService {
     private final SurveyMapper surveyMapper;
     private final RecipientRepository recipientRepository;
-    private final SurveyService surveyService;
+    private final SurveyRepository surveyRepository;
 
     @Autowired
-    public RecipientService(SurveyMapper surveyMapper, RecipientRepository recipientRepository, SurveyService surveyService) {
+    public RecipientService(SurveyMapper surveyMapper, RecipientRepository recipientRepository, SurveyRepository surveyRepository) {
         this.surveyMapper = surveyMapper;
         this.recipientRepository = recipientRepository;
-        this.surveyService = surveyService;
+        this.surveyRepository = surveyRepository;
     }
 
     public List<RecipientDTO> getAllRecipients() {
@@ -30,43 +32,70 @@ public class RecipientService {
     }
 
     public RecipientDTO getRecipientById(long id) {
-        Recipient recipient = recipientRepository.getReferenceById(id);
+        Recipient recipient = recipientRepository.findById(id) .orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + id));
         return surveyMapper.recipientToDto(recipient);
     }
 
     @Transactional
-    public void createRecipient(RecipientDTO recipientDTO) {
+    public RecipientDTO createRecipient(RecipientDTO recipientDTO) {
+        // Check if email already exists
+        if (recipientRepository.existsByEmail(recipientDTO.getEmail())) {
+            throw new IllegalStateException("Email already in use: " + recipientDTO.getEmail());
+        }
+
         Recipient recipient = surveyMapper.recipientDtoToEntity(recipientDTO);
-        recipient.setRecipientId(null);
-        recipientRepository.save(recipient);
+        Recipient savedRecipient = recipientRepository.save(recipient);
+        return surveyMapper.recipientToDto(savedRecipient);
     }
 
     @Transactional
-    public void updateRecipient(RecipientDTO recipientDTO) {
-        Recipient recipient = surveyMapper.recipientDtoToEntity(recipientDTO);
-        recipientRepository.save(recipient);
+    public RecipientDTO updateRecipient(Long id, RecipientDTO recipientDTO) {
+        Recipient recipient = recipientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + id));
+
+        // Check email uniqueness if it's changed
+        if (!recipient.getEmail().equals(recipientDTO.getEmail()) &&
+                recipientRepository.existsByEmail(recipientDTO.getEmail())) {
+            throw new IllegalStateException("Email already in use: " + recipientDTO.getEmail());
+        }
+
+        recipient.setEmail(recipientDTO.getEmail());
+        recipient.setFirstName(recipientDTO.getFirstName());
+        recipient.setLastName(recipientDTO.getLastName());
+        recipient.setCompany(recipientDTO.getCompany());
+        recipient.setType(recipientDTO.getType());
+
+        Recipient updatedRecipient = recipientRepository.save(recipient);
+        return surveyMapper.recipientToDto(updatedRecipient);
+    }
+
+    public void deleteRecipient(Long id) {
+        if (!recipientRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Recipient not found with id: " + id);
+        }
+        recipientRepository.deleteById(id);
     }
 
     @Transactional
-    public void deleteRecipient(RecipientDTO recipientDTO) {
-        Recipient recipient = surveyMapper.recipientDtoToEntity(recipientDTO);
-        recipientRepository.deleteById(recipient.getRecipientId());
+    public void addRecipientToSurvey(Long surveyId, Long recipientId) {
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + surveyId));
+        Recipient recipient = recipientRepository.findById(recipientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + recipientId));
+
+        survey.getRecipients().add(recipient);
+        surveyRepository.save(survey);
     }
 
     @Transactional
-    public void addRecipientToSurvey(SurveyDTO surveyDTO, RecipientDTO recipientDTO) {
-        surveyDTO.getRecipients().add(recipientDTO);
-        surveyService.updateSurvey(surveyDTO);
+    public void removeRecipientFromSurvey(Long surveyId, Long recipientId) {
+        Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + surveyId));
+        Recipient recipient = recipientRepository.findById(recipientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + recipientId));
+
+        survey.getRecipients().remove(recipient);
+        surveyRepository.save(survey);
     }
 
-    @Transactional
-    public void removeRecipientFromSurvey(SurveyDTO surveyDTO, RecipientDTO recipientDTO) {
-        surveyDTO.getRecipients().remove(recipientDTO);
-        surveyService.updateSurvey(surveyDTO);
-    }
-
-    public List<RecipientDTO> getRecipientsBySurvey(SurveyDTO surveyDTO) {
-        List<Recipient> recipients = recipientRepository.findBySurveysId(surveyDTO.getId());
-        return recipients.stream().map(surveyMapper::recipientToDto).toList();
+    public List<RecipientDTO> getRecipientsBySurvey(Long surveyId) {
+        return recipientRepository.findBySurveysId(surveyId).stream().map(surveyMapper::recipientToDto).toList();
     }
 }
