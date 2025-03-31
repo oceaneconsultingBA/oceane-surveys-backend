@@ -22,7 +22,7 @@ public class QuestionOption {
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    public Long questionOptionId;
+    private Long questionOptionId;
 
     /**
      * Question parente
@@ -35,11 +35,11 @@ public class QuestionOption {
      *  Texte de l'option
      */
     @Column(name = "text", nullable = false)
-    public String text;
+    private String text;
 
     /**
      * Ordre d'affichage dans la liste des options
      */
     @Column(name = "display_order")
-    public Integer displayOrder;
+    private Integer displayOrder;
 }

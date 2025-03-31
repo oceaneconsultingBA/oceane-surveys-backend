@@ -25,38 +25,38 @@ public class Recipient {
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    public Long recipientId;
+    private Long recipientId;
 
     /**
      * Email du destinataire
      */
     @Column(name = "email", nullable = false, unique = true)
-    public String email;
+    private String email;
 
     /**
      * Prénom
      */
     @Column(name = "first_name")
-    public String firstName;
+    private String firstName;
 
     /**
      * Nom
      */
     @Column(name = "last_name")
-    public String lastName;
+    private String lastName;
 
     /**
      * Entreprise ou client
      */
     @Column(name = "company")
-    public String company;
+    private String company;
 
     /**
      * Type
      */
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    public RecipientType type;
+    private RecipientType type;
 
     /**
      * Enquête associée à la personne
