@@ -65,8 +65,10 @@ public class SurveyService {
     }
 
     @Transactional
-    public SurveyDTO updateSurvey(SurveyDTO surveyDTO) {
-        Survey existingSurvey = surveyRepository.findById(surveyDTO.getId()).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + surveyDTO.getId()));
+    public SurveyDTO updateSurvey(Long id, SurveyDTO surveyDTO) {
+        Survey existingSurvey = surveyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + id));
+
         // Update basic properties
         existingSurvey.setTitle(surveyDTO.getTitle());
         existingSurvey.setDescription(surveyDTO.getDescription());
@@ -83,14 +85,16 @@ public class SurveyService {
     }
 
     @Transactional
-    public void deleteSurvey(SurveyDTO surveyDTO) {
-        Survey survey = surveyRepository.findById(surveyDTO.getId()) .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + surveyDTO.getId()));
+    public void deleteSurvey(Long id) {
+        Survey survey = surveyRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + id));
+
         // Only draft surveys can be deleted
         if (survey.getStatus() != SurveyStatus.DRAFT) {
             throw new IllegalStateException("Cannot delete a survey that is not in DRAFT status");
         }
 
-        surveyRepository.deleteById(surveyDTO.getId());
+        surveyRepository.deleteById(id);
     }
 
     public List<SurveyDTO> findByStatus(SurveyStatus status) {

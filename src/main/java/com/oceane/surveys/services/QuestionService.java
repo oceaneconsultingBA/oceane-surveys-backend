@@ -2,7 +2,6 @@ package com.oceane.surveys.services;
 
 import com.oceane.surveys.dto.QuestionDTO;
 import com.oceane.surveys.dto.QuestionOptionDTO;
-import com.oceane.surveys.dto.SurveyDTO;
 import com.oceane.surveys.entities.Question;
 import com.oceane.surveys.entities.QuestionOption;
 import com.oceane.surveys.entities.Survey;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class QuestionService {
@@ -116,5 +116,11 @@ public class QuestionService {
 
         // Remove the question
         questionRepository.deleteById(questionId);
+    }
+
+    public List<QuestionDTO> getQuestionsBySurvey(Long surveyId) {
+        return questionRepository.findBySurvey_IdOrderByDisplayOrderAsc(surveyId).stream()
+                .map(surveyMapper::questionToDto)
+                .toList();
     }
 }

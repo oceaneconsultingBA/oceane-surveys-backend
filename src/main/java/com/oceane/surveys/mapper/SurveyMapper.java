@@ -18,7 +18,7 @@ public class SurveyMapper {
 
     public SurveyDTO toDto(Survey survey) {
         SurveyDTO dto = new SurveyDTO();
-        dto.setId(survey.getSurveyId());
+        dto.setId(survey.getId());
         dto.setTitle(survey.getTitle());
         dto.setDescription(survey.getDescription());
         dto.setCreationDate(survey.getCreationDate());
@@ -46,7 +46,7 @@ public class SurveyMapper {
 
     public Survey toEntity(SurveyDTO dto) {
         Survey survey = new Survey();
-        survey.setSurveyId(dto.getId());
+        survey.setId(dto.getId());
         survey.setTitle(dto.getTitle());
         survey.setDescription(dto.getDescription());
         survey.setCreationDate(dto.getCreationDate());
@@ -58,7 +58,7 @@ public class SurveyMapper {
 
     public QuestionDTO questionToDto(Question question) {
         QuestionDTO dto = new QuestionDTO();
-        dto.setId(question.getQuestionId());
+        dto.setId(question.getId());
         dto.setText(question.getText());
         dto.setType(question.getType());
         dto.setRequired(question.isRequired());
@@ -78,7 +78,7 @@ public class SurveyMapper {
 
     public Question questionDtoToEntity(QuestionDTO dto) {
         Question question = new Question();
-        question.setQuestionId(dto.getId());
+        question.setId(dto.getId());
         question.setText(dto.getText());
         question.setType(dto.getType());
         question.setRequired(dto.isRequired());
@@ -99,7 +99,7 @@ public class SurveyMapper {
 
     public QuestionOptionDTO optionToDto(QuestionOption option) {
         QuestionOptionDTO dto = new QuestionOptionDTO();
-        dto.setId(option.getQuestionOptionId());
+        dto.setId(option.getId());
         dto.setText(option.getText());
         dto.setDisplayOrder(option.getDisplayOrder());
         return dto;
@@ -107,7 +107,7 @@ public class SurveyMapper {
 
     public QuestionOption optionDtoToEntity(QuestionOptionDTO dto) {
         QuestionOption option = new QuestionOption();
-        option.setQuestionOptionId(dto.getId());
+        option.setId(dto.getId());
         option.setText(dto.getText());
         option.setDisplayOrder(dto.getDisplayOrder());
         return option;
@@ -115,7 +115,7 @@ public class SurveyMapper {
 
     public RecipientDTO recipientToDto(Recipient recipient) {
         RecipientDTO dto = new RecipientDTO();
-        dto.setId(recipient.getRecipientId());
+        dto.setId(recipient.getId());
         dto.setEmail(recipient.getEmail());
         dto.setFirstName(recipient.getFirstName());
         dto.setLastName(recipient.getLastName());
@@ -126,7 +126,7 @@ public class SurveyMapper {
 
     public Recipient recipientDtoToEntity(RecipientDTO dto) {
         Recipient recipient = new Recipient();
-        recipient.setRecipientId(dto.getId());
+        recipient.setId(dto.getId());
         recipient.setEmail(dto.getEmail());
         recipient.setFirstName(dto.getFirstName());
         recipient.setLastName(dto.getLastName());

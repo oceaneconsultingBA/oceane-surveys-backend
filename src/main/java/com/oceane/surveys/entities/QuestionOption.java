@@ -2,7 +2,6 @@ package com.oceane.surveys.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Entity
 @Table(name = "question_options")
 public class QuestionOption {
@@ -22,7 +20,7 @@ public class QuestionOption {
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    private Long questionOptionId;
+    private Long id;
 
     /**
      * Question parente
@@ -42,4 +40,36 @@ public class QuestionOption {
      */
     @Column(name = "display_order")
     private Integer displayOrder;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
 }
