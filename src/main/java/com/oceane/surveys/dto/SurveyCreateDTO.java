@@ -3,13 +3,11 @@ package com.oceane.surveys.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SurveyCreateDTO {
@@ -22,4 +20,36 @@ public class SurveyCreateDTO {
 
     private List<QuestionDTO> questions = new ArrayList<>();
     private List<Long> recipientIds = new ArrayList<>();
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<QuestionDTO> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<QuestionDTO> questions) {
+        this.questions = questions;
+    }
+
+    public List<Long> getRecipientIds() {
+        return recipientIds;
+    }
+
+    public void setRecipientIds(List<Long> recipientIds) {
+        this.recipientIds = recipientIds;
+    }
 }

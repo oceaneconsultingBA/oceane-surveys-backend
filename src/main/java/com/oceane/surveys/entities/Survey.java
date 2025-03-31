@@ -8,7 +8,6 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
@@ -16,7 +15,6 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Entity
 @Table(name = "surveys")
 public class Survey {
@@ -28,7 +26,7 @@ public class Survey {
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
-    private Long surveyId;
+    private Long id;
 
     /**
      * Titre de l'enquête
@@ -101,5 +99,69 @@ public class Survey {
     @PreUpdate
     protected void onUpdate() {
         lastModifiedDate = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public SurveyStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SurveyStatus status) {
+        this.status = status;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    public Set<Recipient> getRecipients() {
+        return recipients;
+    }
+
+    public void setRecipients(Set<Recipient> recipients) {
+        this.recipients = recipients;
     }
 }
