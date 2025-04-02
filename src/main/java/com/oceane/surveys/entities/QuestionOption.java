@@ -26,7 +26,7 @@ public class QuestionOption {
      * Question parente
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(name = "question_id")
+    @JoinColumn(name = "question_id")
     private Question question;
 
     /**
