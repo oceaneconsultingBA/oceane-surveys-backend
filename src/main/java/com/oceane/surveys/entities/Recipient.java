@@ -59,7 +59,7 @@ public class Recipient {
     /**
      * Enquête associée à la personne
      */
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "recipients", fetch = FetchType.LAZY)
     private Set<Survey> surveys = new HashSet<>();
 
     public Long getId() {

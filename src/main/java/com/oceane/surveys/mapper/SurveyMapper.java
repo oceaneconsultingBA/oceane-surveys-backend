@@ -29,16 +29,16 @@ public class SurveyMapper {
         if (survey.getQuestions() != null && !survey.getQuestions().isEmpty()) {
             List<QuestionDTO> questionDTOs = survey.getQuestions().stream()
                     .map(this::questionToDto)
-                    .collect(Collectors.toList());
+                    .toList();
             dto.setQuestions(questionDTOs);
         }
 
         // Map recipients if not empty
         if (survey.getRecipients() != null && !survey.getRecipients().isEmpty()) {
-            List<RecipientDTO> recipientDTOs = survey.getRecipients().stream()
-                    .map(this::recipientToDto)
-                    .collect(Collectors.toList());
-            dto.setRecipients(recipientDTOs);
+            List<Long> recipientIds = survey.getRecipients().stream()
+                    .map(Recipient::getId)
+                    .toList();
+            dto.setRecipientIds(recipientIds);
         }
 
         return dto;
@@ -78,7 +78,10 @@ public class SurveyMapper {
 
     public Question questionDtoToEntity(QuestionDTO dto) {
         Question question = new Question();
-        question.setId(dto.getId());
+        // Ne pas définir l'ID si c'est 0 ou null
+        if (dto.getId() != null && dto.getId() != 0) {
+            question.setId(dto.getId());
+        }
         question.setText(dto.getText());
         question.setType(dto.getType());
         question.setRequired(dto.isRequired());
@@ -107,7 +110,10 @@ public class SurveyMapper {
 
     public QuestionOption optionDtoToEntity(QuestionOptionDTO dto) {
         QuestionOption option = new QuestionOption();
-        option.setId(dto.getId());
+        // Ne pas définir l'ID si c'est 0 ou null
+        if (dto.getId() != null && dto.getId() != 0) {
+            option.setId(dto.getId());
+        }
         option.setText(dto.getText());
         option.setDisplayOrder(dto.getDisplayOrder());
         return option;

@@ -27,7 +27,7 @@ public class SurveyDTO {
     private SurveyStatus status;
 
     private List<QuestionDTO> questions = new ArrayList<>();
-    private List<RecipientDTO> recipients = new ArrayList<>();
+    private List<Long> recipientIds = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -85,11 +85,11 @@ public class SurveyDTO {
         this.questions = questions;
     }
 
-    public List<RecipientDTO> getRecipients() {
-        return recipients;
+    public List<Long> getRecipientIds() {
+        return recipientIds;
     }
 
-    public void setRecipients(List<RecipientDTO> recipients) {
-        this.recipients = recipients;
+    public void setRecipientIds(List<Long> recipientIds) {
+        this.recipientIds = recipientIds;
     }
 }

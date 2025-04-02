@@ -1,7 +1,9 @@
 package com.oceane.surveys.services;
 
+import com.oceane.surveys.dto.RecipientDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
+import com.oceane.surveys.entities.Question;
 import com.oceane.surveys.entities.Recipient;
 import com.oceane.surveys.entities.Survey;
 import com.oceane.surveys.entities.SurveyStatus;
@@ -49,9 +51,14 @@ public class SurveyService {
 
         // Map and add questions if present
         if (createDTO.getQuestions() != null && !createDTO.getQuestions().isEmpty()) {
-            createDTO.getQuestions().forEach(questionDTO -> {
-                survey.getQuestions().add(surveyMapper.questionDtoToEntity(questionDTO));
-            });
+            List<Question> questions = createDTO.getQuestions().stream()
+                    .map(questionDTO -> {
+                        Question question = surveyMapper.questionDtoToEntity(questionDTO);
+                        question.setSurvey(survey);
+                        return question;
+                    })
+                    .toList();
+            survey.getQuestions().addAll(questions);
         }
 
         // Associate recipients if present
@@ -79,7 +86,25 @@ public class SurveyService {
             throw new IllegalStateException("Cannot update a survey that is not in DRAFT status");
         }
 
-        // The updating of questions should be handled by QuestionService
+        // Supprimer toutes les questions et leurs options (via orphanRemoval=true)
+        existingSurvey.getQuestions().clear();
+
+        // Ajouter les nouvelles questions et options
+        if (surveyDTO.getQuestions() != null) {
+            surveyDTO.getQuestions().forEach(questionDTO -> {
+                Question question = surveyMapper.questionDtoToEntity(questionDTO);
+                question.setSurvey(existingSurvey);
+                existingSurvey.getQuestions().add(question);
+            });
+        }
+
+        // Gérer les destinataires
+        existingSurvey.getRecipients().clear();
+        if (surveyDTO.getRecipientIds() != null && !surveyDTO.getRecipientIds().isEmpty()) {
+            List<Recipient> recipients = recipientRepository.findAllById(surveyDTO.getRecipientIds());
+            recipients.forEach(existingSurvey.getRecipients()::add);
+        }
+
         Survey updatedSurvey = surveyRepository.save(existingSurvey);
         return surveyMapper.toDto(updatedSurvey);
     }
