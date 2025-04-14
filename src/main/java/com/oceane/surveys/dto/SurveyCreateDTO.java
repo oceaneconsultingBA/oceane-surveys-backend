@@ -1,5 +1,6 @@
 package com.oceane.surveys.dto;
 
+import com.oceane.surveys.entities.SurveyStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public class SurveyCreateDTO {
 
     @Size(max = 1000, message = "La description ne peut pas dépasser 1000 caractères")
     private String description;
+    private SurveyStatus status;
 
     private List<QuestionDTO> questions = new ArrayList<>();
     private List<Long> recipientIds = new ArrayList<>();
@@ -51,5 +53,13 @@ public class SurveyCreateDTO {
 
     public void setRecipientIds(List<Long> recipientIds) {
         this.recipientIds = recipientIds;
+    }
+
+    public SurveyStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SurveyStatus status) {
+        this.status = status;
     }
 }

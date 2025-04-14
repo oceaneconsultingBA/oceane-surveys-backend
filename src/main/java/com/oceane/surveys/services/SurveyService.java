@@ -47,7 +47,7 @@ public class SurveyService {
         survey.setDescription(createDTO.getDescription());
         survey.setCreationDate(LocalDateTime.now());
         survey.setLastModifiedDate(LocalDateTime.now());
-        survey.setStatus(SurveyStatus.DRAFT);
+        survey.setStatus(createDTO.getStatus() != null ? createDTO.getStatus() : SurveyStatus.DRAFT);
 
         // Map and add questions if present
         if (createDTO.getQuestions() != null && !createDTO.getQuestions().isEmpty()) {
