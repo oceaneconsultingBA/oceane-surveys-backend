@@ -7,6 +7,7 @@ import com.oceane.surveys.entities.Question;
 import com.oceane.surveys.entities.Recipient;
 import com.oceane.surveys.entities.Survey;
 import com.oceane.surveys.entities.SurveyStatus;
+import com.oceane.surveys.entities.SurveyToken;
 import com.oceane.surveys.exception.ResourceNotFoundException;
 import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.repositories.RecipientRepository;
@@ -23,12 +24,14 @@ public class SurveyService {
     private final SurveyMapper surveyMapper;
     private final SurveyRepository surveyRepository;
     private final RecipientRepository recipientRepository;
+    private final SurveyTokenService surveyTokenService;
 
     @Autowired
-    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository) {
+    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository, SurveyTokenService surveyTokenService) {
         this.surveyMapper = surveyMapper;
         this.surveyRepository = surveyRepository;
         this.recipientRepository = recipientRepository;
+        this.surveyTokenService = surveyTokenService;
     }
 
     public List<SurveyDTO> getAllSurveys() {
@@ -68,6 +71,8 @@ public class SurveyService {
         }
 
         Survey savedSurvey = surveyRepository.save(survey);
+        // Gérer les tokens et mails
+        surveyTokenService.generateTokensAndSendEmails(savedSurvey); 
         return surveyMapper.toDto(savedSurvey);
     }
 
@@ -105,7 +110,7 @@ public class SurveyService {
             recipients.forEach(existingSurvey.getRecipients()::add);
         }
 
-        Survey updatedSurvey = surveyRepository.save(existingSurvey);
+        Survey updatedSurvey = surveyRepository.save(existingSurvey);       
         return surveyMapper.toDto(updatedSurvey);
     }
 

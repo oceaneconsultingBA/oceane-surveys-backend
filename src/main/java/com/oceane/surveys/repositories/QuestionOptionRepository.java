@@ -1,6 +1,5 @@
 package com.oceane.surveys.repositories;
 
-import com.oceane.surveys.entities.Question;
 import com.oceane.surveys.entities.QuestionOption;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
