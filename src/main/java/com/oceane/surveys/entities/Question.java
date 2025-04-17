@@ -3,12 +3,13 @@ package com.oceane.surveys.entities;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  *
  */
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -77,69 +78,5 @@ public class Question {
     public void removeOption(QuestionOption option) {
         options.remove(option);
         option.setQuestion(null);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Survey getSurvey() {
-        return survey;
-    }
-
-    public void setSurvey(Survey survey) {
-        this.survey = survey;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public QuestionType getType() {
-        return type;
-    }
-
-    public void setType(QuestionType type) {
-        this.type = type;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
-    public Integer getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
-    }
-
-    public String getConditionalLogic() {
-        return conditionalLogic;
-    }
-
-    public void setConditionalLogic(String conditionalLogic) {
-        this.conditionalLogic = conditionalLogic;
-    }
-
-    public List<QuestionOption> getOptions() {
-        return options;
-    }
-
-    public void setOptions(List<QuestionOption> options) {
-        this.options = options;
     }
 }
