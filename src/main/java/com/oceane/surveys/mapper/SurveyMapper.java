@@ -1,13 +1,7 @@
 package com.oceane.surveys.mapper;
 
-import com.oceane.surveys.dto.QuestionDTO;
-import com.oceane.surveys.dto.QuestionOptionDTO;
-import com.oceane.surveys.dto.RecipientDTO;
-import com.oceane.surveys.dto.SurveyDTO;
-import com.oceane.surveys.entities.Question;
-import com.oceane.surveys.entities.QuestionOption;
-import com.oceane.surveys.entities.Recipient;
-import com.oceane.surveys.entities.Survey;
+import com.oceane.surveys.dto.*;
+import com.oceane.surveys.entities.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -139,5 +133,43 @@ public class SurveyMapper {
         recipient.setCompany(dto.getCompany());
         recipient.setType(dto.getType());
         return recipient;
+    }
+
+    public AnswerDTO answerToDto(Answer answer) {
+        AnswerDTO dto = new AnswerDTO();
+        dto.setId(answer.getId());
+        dto.setText(answer.getText());
+        dto.setRating(answer.getRating());
+        dto.setRecipientId(answer.getRecipient().getId());
+
+        // Map options if not empty
+        if (answer.getOptions() != null && !answer.getOptions().isEmpty()) {
+            List<QuestionOptionDTO> optionDTOs = answer.getOptions().stream()
+                    .map(this::optionToDto)
+                    .toList();
+            dto.setOptions(optionDTOs);
+        }
+
+        return dto;
+    }
+
+    public Answer answerDtoToEntity(AnswerDTO dto) {
+        Answer answer = new Answer();
+        // Ne pas définir l'ID si c'est 0 ou null
+        if (dto.getId() != null && dto.getId() != 0) {
+            answer.setId(dto.getId());
+        }
+        answer.setText(dto.getText());
+        answer.setRating(dto.getRating());
+
+        // Map options if not empty
+        if (dto.getOptions() != null && !dto.getOptions().isEmpty()) {
+            dto.getOptions().forEach(optionDTO -> {
+                QuestionOption option = optionDtoToEntity(optionDTO);
+                answer.getOptions().add(option);
+            });
+        }
+
+        return answer;
     }
 }
