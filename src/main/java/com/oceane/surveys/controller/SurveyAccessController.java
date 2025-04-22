@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.oceane.surveys.dto.ApiResponse;
 import com.oceane.surveys.dto.SurveyTokenDTO;
 import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.services.SurveyTokenService;
@@ -26,17 +27,16 @@ public class SurveyAccessController {
     }
 
     @GetMapping("/{token}")
-    public ResponseEntity<SurveyTokenDTO> accessSurveyByToken(@PathVariable String token) {
+    public ResponseEntity<ApiResponse<SurveyTokenDTO>> accessSurveyByToken(@PathVariable String token) {
         Optional<SurveyTokenDTO> tokenOpt = surveyTokenService.getSurveyTokenDTOByValidToken(token);
 
-        if (!tokenOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED) 
-                    .body(new SurveyTokenDTO("Le token est expiré ou invalide."));
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>("Le token est expiré ou invalide."));
         }
 
-        return tokenOpt
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        return ResponseEntity.ok(new ApiResponse<>(tokenOpt.get()));
     }
 
     @PatchMapping("/{token}/complete")

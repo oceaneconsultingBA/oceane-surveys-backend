@@ -48,7 +48,6 @@ public class SurveyTokenService {
         for (Recipient recipient : survey.getRecipients()) {
             SurveyToken token = generateToken(survey, recipient);
             if (token != null) {
-                //TODO ACTIVER
                notificationService.sendSurveyToken(token, recipient);
             }
         }
@@ -57,22 +56,17 @@ public class SurveyTokenService {
     public Optional<SurveyTokenDTO> getSurveyTokenDTOByValidToken(String token) {
         return tokenRepository.findByToken(token)
                 .filter(t -> t.getStatus() == TokenStatus.ACTIVE)
-                .map(t -> {
+                .flatMap(t -> {
                     if (t.getExpirationDate().isBefore(LocalDateTime.now())) {
                         t.setStatus(TokenStatus.EXPIRED);
                         tokenRepository.save(t);
-                        return null;
+                        return Optional.empty();
                     }
-    
-                    SurveyDTO surveyDTO = surveyMapper.toDto(t.getSurvey());
-                    surveyDTO.setRecipientIds(new ArrayList<>());
-                    RecipientDTO recipientDTO = surveyMapper.recipientToDto(t.getRecipient());
-                    SurveyTokenDTO dto = new SurveyTokenDTO();
-                    dto.setSurvey(surveyDTO);
-                    dto.setRecipient(recipientDTO);
-                    return dto;
+                    return Optional.of(surveyMapper.toDTO(t));
                 });
     }
+    
+    
 
     public boolean markTokenAsUsed(String tokenValue) {
         Optional<SurveyToken> tokenOpt = tokenRepository.findByToken(tokenValue)

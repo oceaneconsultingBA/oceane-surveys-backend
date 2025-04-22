@@ -4,10 +4,13 @@ import com.oceane.surveys.dto.QuestionDTO;
 import com.oceane.surveys.dto.QuestionOptionDTO;
 import com.oceane.surveys.dto.RecipientDTO;
 import com.oceane.surveys.dto.SurveyDTO;
+import com.oceane.surveys.dto.SurveyTokenDTO;
 import com.oceane.surveys.entities.Question;
 import com.oceane.surveys.entities.QuestionOption;
 import com.oceane.surveys.entities.Recipient;
 import com.oceane.surveys.entities.Survey;
+import com.oceane.surveys.entities.SurveyToken;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -140,4 +143,15 @@ public class SurveyMapper {
         recipient.setType(dto.getType());
         return recipient;
     }
+
+    public SurveyTokenDTO toDTO(SurveyToken token) {
+        SurveyTokenDTO dto = new SurveyTokenDTO();
+        dto.setToken(token.getToken());
+        dto.setExpirationDate(token.getExpirationDate());
+        dto.setStatus(token.getStatus().name());
+        dto.setSurvey(token.getSurvey());
+        dto.setRecipient(token.getRecipient());
+        return dto;
+    }
+    
 }
