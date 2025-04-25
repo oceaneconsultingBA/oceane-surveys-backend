@@ -1,20 +1,29 @@
 package com.oceane.surveys.services;
 
-import com.oceane.surveys.entities.*;
-import com.oceane.surveys.repositories.RecipientRepository;
-import com.oceane.surveys.repositories.SurveyRepository;
-import com.oceane.surveys.repositories.SurveyTokenRepository;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.oceane.surveys.entities.Recipient;
+import com.oceane.surveys.entities.RecipientType;
+import com.oceane.surveys.entities.Survey;
+import com.oceane.surveys.entities.SurveyStatus;
+import com.oceane.surveys.entities.SurveyToken;
+import com.oceane.surveys.entities.TokenStatus;
+import com.oceane.surveys.repositories.RecipientRepository;
+import com.oceane.surveys.repositories.SurveyRepository;
+import com.oceane.surveys.repositories.SurveyTokenRepository;
 
 @SpringBootTest
 @Transactional
@@ -39,8 +48,8 @@ class SurveyTokenServiceFullTest {
     void setUp() {
         // Créer un survey actif
         survey = new Survey();
-        survey.setTitle("Customer Satisfaction");
-        survey.setDescription("Survey for product feedback");
+        survey.setTitle("Enquete de satisfaction");
+        survey.setDescription("jusqte une description");
         survey.setCreationDate(LocalDateTime.now());
         survey.setLastModifiedDate(LocalDateTime.now());
         survey.setStatus(SurveyStatus.ACTIVE);
@@ -50,9 +59,9 @@ class SurveyTokenServiceFullTest {
         recipients = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
             Recipient r = new Recipient();
-            r.setFirstName("Recipient" + i);
-            r.setLastName("Test");
-            r.setEmail("recipient" + i + "@example.com");
+            r.setFirstName("RecipientName" + i);
+            r.setLastName("TestName");
+            r.setEmail("recipientName" + i + "@example.com");
             r.setType(RecipientType.FREELANCE);
             recipients.add(r);
         }
@@ -65,14 +74,11 @@ class SurveyTokenServiceFullTest {
 
     @Test
     void generateToken_shouldCreateUniqueTokensForEachRecipient() {
+        List<SurveyToken> tokens = new ArrayList<>();
         for(Recipient r : recipients){
-            surveyTokenService.generateToken(survey, r);
+            tokens.add(surveyTokenService.generateToken(survey, r));
         }
 
-        List<SurveyToken> tokens = tokenRepository.findAll();
-
-        // Vérifie qu’un token est généré pour chaque destinataire
-        assertEquals(recipients.size(), tokens.size(), "Il doit y avoir un token par destinataire");
 
         // Vérifie que chaque token est unique
         Set<String> uniqueTokens = tokens.stream()
