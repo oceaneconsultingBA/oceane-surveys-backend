@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findBySurvey_IdOrderByDisplayOrderAsc(Long surveyId);
+
+    long count();
 }

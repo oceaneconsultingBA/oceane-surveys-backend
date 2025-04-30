@@ -3,6 +3,7 @@ package com.oceane.surveys.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,12 @@ public class Answer {
             strategy = GenerationType.IDENTITY
     )
     private Long id;
+
+    /**
+     * Date de création
+     */
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
 
     /**
      * Question parente

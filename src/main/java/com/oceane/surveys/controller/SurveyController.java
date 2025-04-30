@@ -1,5 +1,6 @@
 package com.oceane.surveys.controller;
 
+import com.oceane.surveys.dto.StatisticsDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
 import com.oceane.surveys.entities.SurveyStatus;
@@ -40,6 +41,11 @@ public class SurveyController {
     @GetMapping("/{id}")
     public ResponseEntity<SurveyDTO> getSurveyById(@PathVariable Long id) {
         return ResponseEntity.ok(surveyService.getSurveyById(id));
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<StatisticsDTO> getStatistics() {
+        return ResponseEntity.ok(surveyService.getStatistics());
     }
 
     @PostMapping

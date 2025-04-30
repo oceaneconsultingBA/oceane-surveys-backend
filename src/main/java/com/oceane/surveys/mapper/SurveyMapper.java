@@ -138,6 +138,7 @@ public class SurveyMapper {
     public AnswerDTO answerToDto(Answer answer) {
         AnswerDTO dto = new AnswerDTO();
         dto.setId(answer.getId());
+        dto.setCreationDate(answer.getCreationDate());
         dto.setText(answer.getText());
         dto.setRating(answer.getRating());
         dto.setRecipientId(answer.getRecipient().getId());
@@ -159,6 +160,7 @@ public class SurveyMapper {
         if (dto.getId() != null && dto.getId() != 0) {
             answer.setId(dto.getId());
         }
+        answer.setCreationDate(dto.getCreationDate());
         answer.setText(dto.getText());
         answer.setRating(dto.getRating());
 

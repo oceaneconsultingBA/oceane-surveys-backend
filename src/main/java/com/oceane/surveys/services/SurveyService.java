@@ -1,11 +1,14 @@
 package com.oceane.surveys.services;
 
 import com.oceane.surveys.dto.RecipientDTO;
+import com.oceane.surveys.dto.StatisticsDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
 import com.oceane.surveys.entities.*;
 import com.oceane.surveys.exception.ResourceNotFoundException;
 import com.oceane.surveys.mapper.SurveyMapper;
+import com.oceane.surveys.repositories.AnswerRepository;
+import com.oceane.surveys.repositories.QuestionRepository;
 import com.oceane.surveys.repositories.RecipientRepository;
 import com.oceane.surveys.repositories.SurveyRepository;
 import org.slf4j.Logger;
@@ -26,14 +29,28 @@ public class SurveyService {
     private final RecipientRepository recipientRepository;
     private final TokenService tokenService;
     private final EmailService emailService;
+    private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
 
     @Autowired
-    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository, TokenService tokenService, EmailService emailService) {
+    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository, TokenService tokenService, EmailService emailService,
+                         AnswerRepository answerRepository,
+                         QuestionRepository questionRepository) {
         this.surveyMapper = surveyMapper;
         this.surveyRepository = surveyRepository;
         this.recipientRepository = recipientRepository;
         this.tokenService = tokenService;
         this.emailService = emailService;
+        this.answerRepository = answerRepository;
+        this.questionRepository = questionRepository;
+    }
+
+    public StatisticsDTO getStatistics() {
+        StatisticsDTO statisticsDTO = new StatisticsDTO();
+        statisticsDTO.setActiveSurveys(surveyRepository.countByStatus(SurveyStatus.ACTIVE));
+        statisticsDTO.setAnswers(answerRepository.count());
+        statisticsDTO.setQuestions(questionRepository.count());
+        return statisticsDTO;
     }
 
     public List<SurveyDTO> getAllSurveys() {
@@ -73,12 +90,6 @@ public class SurveyService {
         }
 
         Survey savedSurvey = surveyRepository.save(survey);
-
-        // Si l'enquête est créée avec le statut ACTIVE, envoyer les emails
-        if (savedSurvey.getStatus() == SurveyStatus.ACTIVE) {
-            sendSurveyEmails(savedSurvey);
-        }
-
         return surveyMapper.toDto(savedSurvey);
     }
 
