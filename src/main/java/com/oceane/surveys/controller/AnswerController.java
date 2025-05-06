@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,11 @@ public class AnswerController {
     @GetMapping("{surveyId}/recipient/{recipientId}")
     public ResponseEntity<List<AnswerDTO>> getQuestionsBySurveyAndRecipient(@PathVariable Long surveyId, @PathVariable Long recipientId) {
         return ResponseEntity.ok(answerService.getAnswersBySurveyAndRecipient(surveyId, recipientId));
+    }
+
+    @GetMapping("periodicity/{periodicity}")
+    public ResponseEntity<Map<String, Long>> getAnswersByDate(@PathVariable String periodicity) {
+        return ResponseEntity.ok(answerService.getAnswersByDate(periodicity));
     }
 
     @PostMapping("{surveyId}")

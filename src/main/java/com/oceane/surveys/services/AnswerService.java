@@ -7,20 +7,22 @@ import com.oceane.surveys.entities.*;
 import com.oceane.surveys.exception.ResourceNotFoundException;
 import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.repositories.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 public class AnswerService {
     private final SurveyMapper surveyMapper;
+    private final EntityManager entityManager;
     private final QuestionRepository questionRepository;
     private final SurveyRepository surveyRepository;
     private final AnswerRepository answerRepository;
@@ -29,6 +31,7 @@ public class AnswerService {
     @Autowired
     public AnswerService(
             SurveyMapper surveyMapper,
+            EntityManager entityManager,
             QuestionRepository questionRepository,
             SurveyRepository surveyRepository,
             AnswerRepository answerRepository,
@@ -36,6 +39,7 @@ public class AnswerService {
     ) {
         this.surveyMapper = surveyMapper;
         this.questionRepository = questionRepository;
+        this.entityManager = entityManager;
         this.surveyRepository = surveyRepository;
         this.answerRepository = answerRepository;
         this.recipientRepository = recipientRepository;
@@ -86,5 +90,27 @@ public class AnswerService {
         }
 
         return savedAnswers;
+    }
+
+    public Map<String, Long> getAnswersByDate(String periodicity) {
+        String format = switch (periodicity) {
+            case "year" -> "yyyy";
+            case "month" -> "yyyy-MM";
+            default -> "yyyy-MM-dd";
+        };
+        //Query query = entityManager.createQuery("select answer.creationDate, count(answer.id) as answerCount from Answer answer order by answer.creationDate desc group by answer.creationDate");
+        Query query = entityManager.createQuery("select to_char(answer.creationDate, '" + format + "'), count(answer.id) as answerCount from Answer answer group by to_char(answer.creationDate, '" + format + "') order by to_char(answer.creationDate, '" + format + "')");
+        List results = query.getResultList();
+
+        Map<String, Long> output = new HashMap<>(results.size());
+
+        for (Object result : results) {
+            Object[] row = (Object[]) result;
+
+            if (row[0] != null) {
+                output.put((String) row[0], (Long) row[1]);
+            }
+        }
+        return output;
     }
 }
