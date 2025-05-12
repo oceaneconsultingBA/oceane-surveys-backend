@@ -3,14 +3,13 @@ package com.oceane.surveys.services;
 import com.oceane.surveys.dto.RecipientDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
-import com.oceane.surveys.entities.Question;
-import com.oceane.surveys.entities.Recipient;
-import com.oceane.surveys.entities.Survey;
-import com.oceane.surveys.entities.SurveyStatus;
+import com.oceane.surveys.entities.*;
 import com.oceane.surveys.exception.ResourceNotFoundException;
 import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.repositories.RecipientRepository;
 import com.oceane.surveys.repositories.SurveyRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +19,21 @@ import java.util.List;
 
 @Service
 public class SurveyService {
+    private static final Logger logger = LoggerFactory.getLogger(SurveyService.class);
+
     private final SurveyMapper surveyMapper;
     private final SurveyRepository surveyRepository;
     private final RecipientRepository recipientRepository;
+    private final TokenService tokenService;
+    private final EmailService emailService;
 
     @Autowired
-    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository) {
+    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository, TokenService tokenService, EmailService emailService) {
         this.surveyMapper = surveyMapper;
         this.surveyRepository = surveyRepository;
         this.recipientRepository = recipientRepository;
+        this.tokenService = tokenService;
+        this.emailService = emailService;
     }
 
     public List<SurveyDTO> getAllSurveys() {
@@ -68,6 +73,12 @@ public class SurveyService {
         }
 
         Survey savedSurvey = surveyRepository.save(survey);
+
+        // Si l'enquête est créée avec le statut ACTIVE, envoyer les emails
+        if (savedSurvey.getStatus() == SurveyStatus.ACTIVE) {
+            sendSurveyEmails(savedSurvey);
+        }
+
         return surveyMapper.toDto(savedSurvey);
     }
 
@@ -81,10 +92,17 @@ public class SurveyService {
         existingSurvey.setDescription(surveyDTO.getDescription());
         existingSurvey.setLastModifiedDate(LocalDateTime.now());
 
-        // Update is only allowed for draft surveys
-        if (existingSurvey.getStatus() != SurveyStatus.DRAFT) {
-            throw new IllegalStateException("Cannot update a survey that is not in DRAFT status");
+        // Si l'enquête était en DRAFT et qu'on demande de la passer en ACTIVE
+        boolean wasInDraft = existingSurvey.getStatus() == SurveyStatus.DRAFT;
+        boolean changingToActive = surveyDTO.getStatus() == SurveyStatus.ACTIVE;
+
+        // Vérifier si on peut modifier l'enquête
+        if (!wasInDraft && !existingSurvey.getStatus().equals(surveyDTO.getStatus())) {
+            throw new IllegalStateException("Cannot update status of a survey that is not in DRAFT status");
         }
+
+        // Mise à jour du statut
+        existingSurvey.setStatus(surveyDTO.getStatus());
 
         // Supprimer toutes les questions et leurs options (via orphanRemoval=true)
         existingSurvey.getQuestions().clear();
@@ -106,6 +124,12 @@ public class SurveyService {
         }
 
         Survey updatedSurvey = surveyRepository.save(existingSurvey);
+
+        // Si l'enquête est passée de DRAFT à ACTIVE, envoyer les emails
+        if (wasInDraft && changingToActive) {
+            sendSurveyEmails(updatedSurvey);
+        }
+
         return surveyMapper.toDto(updatedSurvey);
     }
 
@@ -172,5 +196,41 @@ public class SurveyService {
     public List<SurveyDTO> searchByKeyword(String textInTitle) {
         List<Survey> surveys = surveyRepository.findByTitleContainingIgnoreCase(textInTitle);
         return surveys.stream().map(surveyMapper::toDto).toList();
+    }
+
+    /**
+     * Méthode privée pour envoyer les emails aux destinataires d'une enquête
+     */
+    private void sendSurveyEmails(Survey survey) {
+        // Vérification que l'enquête a au moins une question
+        if (survey.getQuestions() == null || survey.getQuestions().isEmpty()) {
+            throw new IllegalStateException("L'enquête doit contenir au moins une question");
+        }
+
+        // Vérification que l'enquête a au moins un destinataire
+        if (survey.getRecipients() == null || survey.getRecipients().isEmpty()) {
+            throw new IllegalStateException("L'enquête doit avoir au moins un destinataire");
+        }
+
+        // Génération et envoi d'emails pour chaque destinataire
+        for (Recipient recipient : survey.getRecipients()) {
+            try {
+                // Générer un token unique pour ce destinataire et cette enquête
+                var token = tokenService.generateTokenForRecipient(survey, recipient);
+
+                // Construire l'URL de l'enquête avec le token
+                String surveyUrl = tokenService.buildSurveyUrl(token);
+
+                // Envoyer l'email d'invitation
+                emailService.sendSurveyInvitation(survey, recipient, surveyUrl);
+
+                logger.info("Email envoyé à {} pour l'enquête {}", recipient.getEmail(), survey.getTitle());
+            } catch (Exception e) {
+                // Log l'erreur mais continue le traitement des autres destinataires
+                logger.error("Erreur lors de l'envoi à {}: {}", recipient.getEmail(), e.getMessage());
+            }
+        }
+
+        logger.info("Enquête {} validée et emails envoyés avec succès", survey.getTitle());
     }
 }
