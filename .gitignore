@@ -1,27 +1,33 @@
-### Configuration files with sensitive information ###
-# Specific application properties files
-src/main/resources/application-local.properties
-src/main/resources/application-dev-local.properties
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Environment files
-.env
-*.env
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-# Properties files containing passwords (alternative approach)
-# Uncomment if you want to exclude all properties files and include them selectively
-# src/main/resources/application*.properties
-# !src/main/resources/application.properties
-# !src/main/resources/application-template.properties
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-# Certificates and keys
-*.jks
-*.p12
-*.pem
-*.key
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-# Docker environment files
-.env.docker
-docker.env
-
-# Local configuration
-config/local/
+### VS Code ###
+.vscode/
