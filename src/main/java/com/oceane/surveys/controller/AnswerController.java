@@ -37,6 +37,11 @@ public class AnswerController {
         return ResponseEntity.ok(answerService.getAnswersByDate(periodicity));
     }
 
+    @GetMapping("delay/{periodicity}")
+    public ResponseEntity<Map<String, Long>> getAnswersByDelay(@PathVariable String periodicity) {
+        return ResponseEntity.ok(answerService.getAnswersByDelay(periodicity));
+    }
+
     @PostMapping("{surveyId}")
     public ResponseEntity<Map<Long, AnswerDTO>> saveAnswers(
             @PathVariable Long surveyId,

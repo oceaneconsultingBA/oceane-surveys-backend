@@ -113,4 +113,26 @@ public class AnswerService {
         }
         return output;
     }
+
+    public Map<String, Long> getAnswersByDelay(String periodicity) {
+        String format = switch (periodicity) {
+            case "year" -> "year";
+            case "month" -> "month";
+            default -> "day";
+        };
+        //Query query = entityManager.createQuery("select answer.creationDate, count(answer.id) as answerCount from Answer answer order by answer.creationDate desc group by answer.creationDate");
+        Query query = entityManager.createQuery("select DATEDIFF(" + format + ", answer.question.survey.creationDate, answer.creationDate), count(answer.id) as answerCount from Answer answer group by DATEDIFF(" + format + ", answer.question.survey.creationDate, answer.creationDate) order by DATEDIFF(" + format + ", answer.question.survey.creationDate, answer.creationDate)");
+        List results = query.getResultList();
+
+        Map<String, Long> output = new HashMap<>(results.size());
+
+        for (Object result : results) {
+            Object[] row = (Object[]) result;
+
+            if (row[0] != null) {
+                output.put(String.valueOf((Long) row[0]), (Long) row[1]);
+            }
+        }
+        return output;
+    }
 }
