@@ -209,3 +209,96 @@ docker-compose up -d
    ```bash
    docker-compose logs db
    ```
+
+# Oceane Surveys - Gestion des accès EC2
+
+## 📋 Vue d'ensemble
+
+Cette partie explique comment donner accès à une instance EC2 existante à de nouveaux développeurs de l'équipe.
+
+## 🏗️ Architecture actuelle
+
+- **Instance EC2** : `oceane-enquetes-mvp`
+- **IP Élastique** : `15.237.122.246`
+- **Région** : `eu-west-3` (Paris)
+- **Utilisateur SSH** : `ec2-user`
+- **Key Pair principale** : `oceane-enquetes-mvp.pem`
+
+## 🔑 Ajout d'un nouvel utilisateur
+
+### Étape 1 : Le nouvel utilisateur crée sa Key Pair
+
+1. **Console AWS** → EC2 → Key Pairs
+2. Cliquer sur **"Create key pair"**
+3. **Configuration recommandée** :
+   - Nom : `prenom-oceane-enquetes`
+   - Type : RSA
+   - Format : .pem
+4. **Télécharger** le fichier .pem
+5. **Sécuriser** le fichier :
+   ```bash
+   chmod 400 fichier.pem
+   ```
+
+### Étape 2 : Récupération de la clé publique
+
+Le nouvel utilisateur exécute :
+```bash
+ssh-keygen -y -f son-fichier.pem
+```
+
+**Résultat** : Une clé publique commençant par `ssh-rsa AAAA...`
+
+### Étape 3 : Ajout de la clé à l'instance
+
+```bash
+# Connexion à l'instance
+ssh -i "chemin-vers-la-cle/oceane-enquetes-mvp.pem" ec2-user@15.237.122.246
+
+# Ajout de la nouvelle clé publique
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAA... [clé publique complète]" >> ~/.ssh/authorized_keys
+
+# Vérification des permissions
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+```
+
+### Étape 4 : Test de connexion
+
+```bash
+ssh -i "son-fichier.pem" ec2-user@15.237.122.246
+```
+
+## 🚀 Déploiement pour le nouvel utilisateur
+
+### Connexion SSH
+```bash
+ssh -i "votre-cle.pem" ec2-user@15.237.122.246
+```
+
+### Transfer de fichiers
+Exemple:
+```bash
+# Upload d'un JAR
+scp -i "votre-cle.pem" nouveau-jar.jar ec2-user@15.237.122.246:~/oceane-enquetes/app/
+
+# Upload d'un dossier
+scp -r -i "votre-cle.pem" ./dossier/ ec2-user@15.237.122.246:~/oceane-enquetes/
+```
+
+### Commandes de déploiement
+```bash
+# Se connecter à l'instance
+ssh -i "votre-cle.pem" ec2-user@15.237.122.246
+
+# Aller dans le répertoire de l'application
+cd ~/oceane-enquetes/
+
+# Redémarrer les services Docker
+docker-compose down
+docker-compose up -d
+
+# Vérifier les logs
+docker-compose logs -f
+```
+
