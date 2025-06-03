@@ -4,19 +4,16 @@ import com.oceane.surveys.entities.Recipient;
 import com.oceane.surveys.entities.Survey;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class EmailService {
-
-    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
-
     @Autowired
     private JavaMailSender mailSender;
 
@@ -28,7 +25,7 @@ public class EmailService {
      */
     public void sendSurveyInvitation(Survey survey, Recipient recipient, String surveyUrl) {
         try {
-            logger.info("Envoi d'email d'invitation à {}", recipient.getEmail());
+            log.info("Envoi d'email d'invitation à {}", recipient.getEmail());
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -41,9 +38,9 @@ public class EmailService {
             helper.setText(content, true); // true pour le contenu HTML
 
             mailSender.send(message);
-            logger.info("Email envoyé avec succès à {}", recipient.getEmail());
+            log.info("Email envoyé avec succès à {}", recipient.getEmail());
         } catch (MessagingException e) {
-            logger.error("Erreur lors de l'envoi de l'email à {}: {}", recipient.getEmail(), e.getMessage());
+            log.error("Erreur lors de l'envoi de l'email à {}: {}", recipient.getEmail(), e.getMessage());
             throw new RuntimeException("Erreur lors de l'envoi de l'email", e);
         }
     }

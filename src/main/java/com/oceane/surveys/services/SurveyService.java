@@ -1,6 +1,5 @@
 package com.oceane.surveys.services;
 
-import com.oceane.surveys.dto.RecipientDTO;
 import com.oceane.surveys.dto.StatisticsDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
@@ -11,8 +10,7 @@ import com.oceane.surveys.repositories.AnswerRepository;
 import com.oceane.surveys.repositories.QuestionRepository;
 import com.oceane.surveys.repositories.RecipientRepository;
 import com.oceane.surveys.repositories.SurveyRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SurveyService {
-    private static final Logger logger = LoggerFactory.getLogger(SurveyService.class);
-
     private final SurveyMapper surveyMapper;
     private final SurveyRepository surveyRepository;
     private final RecipientRepository recipientRepository;
@@ -120,6 +117,7 @@ public class SurveyService {
 
         // Ajouter les nouvelles questions et options
         if (surveyDTO.getQuestions() != null) {
+            log.info("{} question(s)", surveyDTO.getQuestions().size());
             surveyDTO.getQuestions().forEach(questionDTO -> {
                 Question question = surveyMapper.questionDtoToEntity(questionDTO);
                 question.setSurvey(existingSurvey);
@@ -130,6 +128,7 @@ public class SurveyService {
         // Gérer les destinataires
         existingSurvey.getRecipients().clear();
         if (surveyDTO.getRecipientIds() != null && !surveyDTO.getRecipientIds().isEmpty()) {
+            log.info("{} destinataire(s)", surveyDTO.getRecipientIds().size());
             List<Recipient> recipients = recipientRepository.findAllById(surveyDTO.getRecipientIds());
             recipients.forEach(existingSurvey.getRecipients()::add);
         }
@@ -137,6 +136,7 @@ public class SurveyService {
         Survey updatedSurvey = surveyRepository.save(existingSurvey);
 
         // Si l'enquête est passée de DRAFT à ACTIVE, envoyer les emails
+        log.info("wasInDraft = {}; changingToActive = {}", wasInDraft, changingToActive);
         if (wasInDraft && changingToActive) {
             sendSurveyEmails(updatedSurvey);
         }
@@ -223,6 +223,8 @@ public class SurveyService {
             throw new IllegalStateException("L'enquête doit avoir au moins un destinataire");
         }
 
+        log.info("Envoi un mail aux {} destinataire(s)", survey.getRecipients().size());
+
         // Génération et envoi d'emails pour chaque destinataire
         for (Recipient recipient : survey.getRecipients()) {
             try {
@@ -235,13 +237,13 @@ public class SurveyService {
                 // Envoyer l'email d'invitation
                 emailService.sendSurveyInvitation(survey, recipient, surveyUrl);
 
-                logger.info("Email envoyé à {} pour l'enquête {}", recipient.getEmail(), survey.getTitle());
+                log.info("Email envoyé à {} pour l'enquête {}", recipient.getEmail(), survey.getTitle());
             } catch (Exception e) {
                 // Log l'erreur mais continue le traitement des autres destinataires
-                logger.error("Erreur lors de l'envoi à {}: {}", recipient.getEmail(), e.getMessage());
+                log.error("Erreur lors de l'envoi à {}: {}", recipient.getEmail(), e.getMessage());
             }
         }
 
-        logger.info("Enquête {} validée et emails envoyés avec succès", survey.getTitle());
+        log.info("Enquête {} validée et emails envoyés avec succès", survey.getTitle());
     }
 }
