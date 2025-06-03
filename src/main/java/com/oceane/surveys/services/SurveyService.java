@@ -87,6 +87,13 @@ public class SurveyService {
         }
 
         Survey savedSurvey = surveyRepository.save(survey);
+
+        // Si l'enquête est passée à ACTIVE, envoyer les emails
+        log.info("changingToActive = {}", savedSurvey.getStatus());
+        if (savedSurvey.getStatus() == SurveyStatus.ACTIVE) {
+            sendSurveyEmails(savedSurvey);
+        }
+
         return surveyMapper.toDto(savedSurvey);
     }
 
