@@ -10,6 +10,7 @@ import com.oceane.surveys.repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @Service
 public class AnswerService {
     private final SurveyMapper surveyMapper;
@@ -59,6 +61,7 @@ public class AnswerService {
 
     @Transactional
     public Map<Long, AnswerDTO> saveAnswers(Long surveyId, @Valid Map<Long, AnswerDTO> answerDTOsByQuestionId) {
+        log.info("{} answer(s) to save", answerDTOsByQuestionId.size());
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + surveyId));
 
         // Verify survey is in ACTIVE status
