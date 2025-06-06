@@ -104,6 +104,7 @@ public class AnswerService {
         //Query query = entityManager.createQuery("select answer.creationDate, count(answer.id) as answerCount from Answer answer order by answer.creationDate desc group by answer.creationDate");
         Query query = entityManager.createQuery("select to_char(answer.creationDate, '" + format + "'), count(answer.id) as answerCount from Answer answer group by to_char(answer.creationDate, '" + format + "') order by to_char(answer.creationDate, '" + format + "')");
         List results = query.getResultList();
+        log.info("{} period(s) for answers", results.size());
 
         Map<String, Long> output = new HashMap<>(results.size());
 
