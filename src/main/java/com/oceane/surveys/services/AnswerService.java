@@ -127,6 +127,7 @@ public class AnswerService {
         //Query query = entityManager.createQuery("select answer.creationDate, count(answer.id) as answerCount from Answer answer order by answer.creationDate desc group by answer.creationDate");
         Query query = entityManager.createQuery("select DATEDIFF(" + format + ", answer.question.survey.creationDate, answer.creationDate), count(answer.id) as answerCount from Answer answer group by DATEDIFF(" + format + ", answer.question.survey.creationDate, answer.creationDate) order by DATEDIFF(" + format + ", answer.question.survey.creationDate, answer.creationDate)");
         List results = query.getResultList();
+        log.info("{} period(s) for delayed answers", results.size());
 
         Map<String, Long> output = new HashMap<>(results.size());
 
