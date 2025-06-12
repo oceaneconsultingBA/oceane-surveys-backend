@@ -11,6 +11,7 @@ import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.repositories.QuestionOptionRepository;
 import com.oceane.surveys.repositories.QuestionRepository;
 import com.oceane.surveys.repositories.SurveyRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class QuestionService {
     private final SurveyMapper surveyMapper;
@@ -81,6 +83,7 @@ public class QuestionService {
             // Remove existing options and add new ones
             optionRepository.deleteByQuestionId(questionId);
             question.getOptions().clear();
+            log.info("{} option(s) for the question {}", questionDTO.getOptions().size(), questionDTO.getText());
 
             for (QuestionOptionDTO optionDTO : questionDTO.getOptions()) {
                 QuestionOption option = new QuestionOption();
