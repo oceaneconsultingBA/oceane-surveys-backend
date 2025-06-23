@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,11 +41,12 @@ public class AnswerController {
         return ResponseEntity.ok(answerService.getAnswersByDelay(periodicity));
     }
 
-    @PostMapping("{surveyId}")
+    @PostMapping("{surveyId}/{token}")
     public ResponseEntity<Map<Long, AnswerDTO>> saveAnswers(
             @PathVariable Long surveyId,
+            @PathVariable String token,
             @Valid @RequestBody Map<Long, AnswerDTO> answerDTOsByQuestionId) {
-        Map<Long, AnswerDTO> createdQuestion = answerService.saveAnswers(surveyId, answerDTOsByQuestionId);
+        Map<Long, AnswerDTO> createdQuestion = answerService.saveAnswers(surveyId, token, answerDTOsByQuestionId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuestion);
     }
 }

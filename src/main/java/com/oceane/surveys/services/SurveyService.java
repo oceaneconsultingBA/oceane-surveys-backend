@@ -237,6 +237,7 @@ public class SurveyService {
             try {
                 // Générer un token unique pour ce destinataire et cette enquête
                 var token = tokenService.generateTokenForRecipient(survey, recipient);
+                log.info("Email à envoyer avec le token {}", token);
 
                 // Construire l'URL de l'enquête avec le token
                 String surveyUrl = tokenService.buildSurveyUrl(token);

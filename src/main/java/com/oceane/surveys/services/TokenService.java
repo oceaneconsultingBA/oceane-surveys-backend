@@ -1,8 +1,12 @@
 package com.oceane.surveys.services;
 
+import com.oceane.surveys.dto.RecipientDTO;
+import com.oceane.surveys.dto.SurveyDTO;
+import com.oceane.surveys.dto.TokenDTO;
 import com.oceane.surveys.entities.Recipient;
 import com.oceane.surveys.entities.Survey;
 import com.oceane.surveys.entities.SurveyToken;
+import com.oceane.surveys.mapper.SurveyMapper;
 import com.oceane.surveys.repositories.SurveyTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +17,21 @@ import java.util.UUID;
 
 @Service
 public class TokenService {
-
-    @Autowired
-    private SurveyTokenRepository tokenRepository;
-
     @Value("${aws.survey.baseUrl}")
     private String surveyBaseUrl;
+
+    private final SurveyMapper surveyMapper;
+
+    private final SurveyTokenRepository tokenRepository;
+
+    @Autowired
+    public TokenService(
+            SurveyMapper surveyMapper,
+            SurveyTokenRepository tokenRepository
+    ) {
+        this.surveyMapper = surveyMapper;
+        this.tokenRepository = tokenRepository;
+    }
 
     /**
      * Génère un token unique pour un destinataire d'enquête
@@ -58,13 +71,53 @@ public class TokenService {
      * Vérifie si un token est valide (existe, non utilisé, non expiré)
      */
     public boolean isTokenValid(String tokenValue) {
+        TokenDTO token = getToken(tokenValue);
+        return token != null;
+    }
+
+    /**
+     * Retourne un token purge.
+     *
+     * @param tokenValue
+     * @return
+     */
+    public TokenDTO getToken(String tokenValue) {
         var tokenOpt = tokenRepository.findByToken(tokenValue);
-        if (tokenOpt.isEmpty()) {
-            return false;
+
+        if (tokenOpt.isPresent()) {
+            SurveyToken token = tokenOpt.get();
+            if (!token.isUsed() && token.getExpiresAt().isAfter(LocalDateTime.now())) {
+                return surveyMapper.toDto(token);
+            }
         }
 
-        SurveyToken token = tokenOpt.get();
-        return !token.isUsed() && token.getExpiresAt().isAfter(LocalDateTime.now());
+        return null;
+    }
+
+    /**
+     * Vérifie si un token est valide (existe, non utilisé, non expiré)
+     */
+    public SurveyDTO getSurvey(String tokenValue) {
+        TokenDTO token = getToken(tokenValue);
+
+        if (token != null) {
+            return token.getSurvey();
+        }
+
+        return null;
+    }
+
+    /**
+     * Retourne le destinataire.
+     */
+    public RecipientDTO getRecipient(String tokenValue) {
+        TokenDTO token = getToken(tokenValue);
+
+        if (token != null) {
+            return token.getRecipient();
+        }
+
+        return null;
     }
 
     /**

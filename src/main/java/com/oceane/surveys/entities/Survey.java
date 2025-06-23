@@ -63,7 +63,7 @@ public class Survey {
     /**
      * Questions associées
      */
-    @OneToMany(mappedBy = "survey", cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
 
     /**

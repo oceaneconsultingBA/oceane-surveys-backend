@@ -3,8 +3,10 @@ package com.oceane.surveys.controller;
 import com.oceane.surveys.dto.StatisticsDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
+import com.oceane.surveys.dto.TokenDTO;
 import com.oceane.surveys.entities.SurveyStatus;
 import com.oceane.surveys.services.SurveyService;
+import com.oceane.surveys.services.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +20,12 @@ import java.util.List;
 public class SurveyController {
 
     private final SurveyService surveyService;
+    private final TokenService tokenService;
 
     @Autowired
-    public SurveyController(SurveyService surveyService) {
+    public SurveyController(SurveyService surveyService, TokenService tokenService) {
         this.surveyService = surveyService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping
@@ -41,6 +45,11 @@ public class SurveyController {
     @GetMapping("/{id}")
     public ResponseEntity<SurveyDTO> getSurveyById(@PathVariable Long id) {
         return ResponseEntity.ok(surveyService.getSurveyById(id));
+    }
+
+    @GetMapping("/token/{token}")
+    public ResponseEntity<TokenDTO> getSurveyByToken(@PathVariable String token) {
+        return ResponseEntity.ok(tokenService.getToken(token));
     }
 
     @GetMapping("/statistics")

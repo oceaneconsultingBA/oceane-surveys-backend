@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 public class SurveyMapper {
 
     public SurveyDTO toDto(Survey survey) {
+        if (survey == null) {
+            return null;
+        }
+
         SurveyDTO dto = new SurveyDTO();
         dto.setId(survey.getId());
         dto.setTitle(survey.getTitle());
@@ -39,6 +43,10 @@ public class SurveyMapper {
     }
 
     public Survey toEntity(SurveyDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         Survey survey = new Survey();
         survey.setId(dto.getId());
         survey.setTitle(dto.getTitle());
@@ -46,6 +54,34 @@ public class SurveyMapper {
         survey.setCreationDate(dto.getCreationDate());
         survey.setLastModifiedDate(dto.getLastModifiedDate());
         survey.setStatus(dto.getStatus());
+
+        return survey;
+    }
+
+    public TokenDTO toDto(SurveyToken token) {
+        if (token == null) {
+            return null;
+        }
+
+        var dto = new TokenDTO();
+        dto.setId(token.getId());
+        dto.setToken(token.getToken());
+        dto.setSurvey(toDto(token.getSurvey()));
+        dto.setRecipient(recipientToDto(token.getRecipient()));
+
+        return dto;
+    }
+
+    public SurveyToken toEntity(TokenDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        var survey = new SurveyToken();
+        survey.setId(dto.getId());
+        survey.setToken(dto.getToken());
+        survey.setSurvey(toEntity(dto.getSurvey()));
+        survey.setRecipient(recipientDtoToEntity(dto.getRecipient()));
 
         return survey;
     }
@@ -114,6 +150,10 @@ public class SurveyMapper {
     }
 
     public RecipientDTO recipientToDto(Recipient recipient) {
+        if (recipient == null) {
+            return null;
+        }
+
         RecipientDTO dto = new RecipientDTO();
         dto.setId(recipient.getId());
         dto.setEmail(recipient.getEmail());
@@ -125,6 +165,10 @@ public class SurveyMapper {
     }
 
     public Recipient recipientDtoToEntity(RecipientDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         Recipient recipient = new Recipient();
         recipient.setId(dto.getId());
         recipient.setEmail(dto.getEmail());

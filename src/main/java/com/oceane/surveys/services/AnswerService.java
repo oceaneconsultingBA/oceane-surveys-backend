@@ -1,8 +1,8 @@
 package com.oceane.surveys.services;
 
 import com.oceane.surveys.dto.AnswerDTO;
-import com.oceane.surveys.dto.QuestionDTO;
-import com.oceane.surveys.dto.QuestionOptionDTO;
+import com.oceane.surveys.dto.RecipientDTO;
+import com.oceane.surveys.dto.SurveyDTO;
 import com.oceane.surveys.entities.*;
 import com.oceane.surveys.exception.ResourceNotFoundException;
 import com.oceane.surveys.mapper.SurveyMapper;
@@ -15,9 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -29,6 +26,7 @@ public class AnswerService {
     private final SurveyRepository surveyRepository;
     private final AnswerRepository answerRepository;
     private final RecipientRepository recipientRepository;
+    private final TokenService tokenService;
 
     @Autowired
     public AnswerService(
@@ -37,7 +35,8 @@ public class AnswerService {
             QuestionRepository questionRepository,
             SurveyRepository surveyRepository,
             AnswerRepository answerRepository,
-            RecipientRepository recipientRepository
+            RecipientRepository recipientRepository,
+            TokenService tokenService
     ) {
         this.surveyMapper = surveyMapper;
         this.questionRepository = questionRepository;
@@ -45,6 +44,7 @@ public class AnswerService {
         this.surveyRepository = surveyRepository;
         this.answerRepository = answerRepository;
         this.recipientRepository = recipientRepository;
+        this.tokenService = tokenService;
     }
 
     public List<AnswerDTO> getAnswersBySurvey(Long surveyId) {
@@ -60,9 +60,17 @@ public class AnswerService {
     }
 
     @Transactional
-    public Map<Long, AnswerDTO> saveAnswers(Long surveyId, @Valid Map<Long, AnswerDTO> answerDTOsByQuestionId) {
+    public Map<Long, AnswerDTO> saveAnswers(Long surveyId, String tokenValue, @Valid Map<Long, AnswerDTO> answerDTOsByQuestionId) {
         log.info("{} answer(s) to save", answerDTOsByQuestionId.size());
         Survey survey = surveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + surveyId));
+
+        SurveyDTO surveyFromToken = tokenService.getSurvey(tokenValue);
+
+        if (surveyFromToken == null || !Objects.equals(surveyFromToken.getId(), survey.getId())) {
+            throw new IllegalStateException("No valid token associated to the right survey");
+        }
+
+        RecipientDTO recipientFromToken = tokenService.getRecipient(tokenValue);
 
         // Verify survey is in ACTIVE status
         if (survey.getStatus() != SurveyStatus.ACTIVE) {
@@ -75,6 +83,11 @@ public class AnswerService {
             Long questionId = questionIdAndAnswer.getKey();
             AnswerDTO answerDTO = questionIdAndAnswer.getValue();
             Recipient recipient = recipientRepository.findById(answerDTO.getRecipientId()).orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + answerDTO.getRecipientId()));
+
+            if (!Objects.equals(recipientFromToken.getId(), recipient.getId())) {
+                throw new IllegalStateException("No valid token associated to the right recipient");
+            }
+
             Question question = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question not found with id: " + questionId));
             Answer answer = surveyMapper.answerDtoToEntity(answerDTO);
             answer.setId(null);
@@ -91,6 +104,8 @@ public class AnswerService {
             AnswerDTO savedAnswerDTO = surveyMapper.answerToDto(savedAnswer);
             savedAnswers.put(questionId, savedAnswerDTO);
         }
+
+        tokenService.markTokenAsUsed(tokenValue);
 
         return savedAnswers;
     }
