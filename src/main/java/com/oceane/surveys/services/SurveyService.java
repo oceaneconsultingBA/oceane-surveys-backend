@@ -1,5 +1,6 @@
 package com.oceane.surveys.services;
 
+import com.oceane.surveys.dto.AnswerDTO;
 import com.oceane.surveys.dto.StatisticsDTO;
 import com.oceane.surveys.dto.SurveyCreateDTO;
 import com.oceane.surveys.dto.SurveyDTO;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -24,18 +27,22 @@ public class SurveyService {
     private final SurveyMapper surveyMapper;
     private final SurveyRepository surveyRepository;
     private final RecipientRepository recipientRepository;
+    private final AnswerService answerService;
     private final TokenService tokenService;
     private final EmailService emailService;
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
 
     @Autowired
-    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository, TokenService tokenService, EmailService emailService,
+    public SurveyService(SurveyMapper surveyMapper, SurveyRepository surveyRepository, RecipientRepository recipientRepository,
+                         AnswerService answerService,
+                         TokenService tokenService, EmailService emailService,
                          AnswerRepository answerRepository,
                          QuestionRepository questionRepository) {
         this.surveyMapper = surveyMapper;
         this.surveyRepository = surveyRepository;
         this.recipientRepository = recipientRepository;
+        this.answerService = answerService;
         this.tokenService = tokenService;
         this.emailService = emailService;
         this.answerRepository = answerRepository;
@@ -55,8 +62,27 @@ public class SurveyService {
     }
 
     public SurveyDTO getSurveyById(long id) {
-        Survey survey = surveyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + id));;
+        Survey survey = surveyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + id));
         return surveyMapper.toDto(survey);
+    }
+
+    public Map<Long, LocalDateTime> getSurveyAnswerState(long id) {
+        Survey survey = surveyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Survey not found with id: " + id));
+
+        Map<Long, LocalDateTime> answerState = new HashMap<>(survey.getRecipients().size());
+
+        for (Recipient recipient : survey.getRecipients()) {
+            List<AnswerDTO> answers = answerService.getAnswersBySurveyAndRecipient(survey.getId(), recipient.getId());
+
+            if (answers != null && !answers.isEmpty()) {
+                // get(0) because the creation date is the same in all the answers
+                answerState.put(recipient.getId(), answers.get(0).getCreationDate());
+            } else {
+                answerState.put(recipient.getId(), null);
+            }
+        }
+
+        return answerState;
     }
 
     @Transactional

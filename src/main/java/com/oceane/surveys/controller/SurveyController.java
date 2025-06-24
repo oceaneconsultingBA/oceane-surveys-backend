@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/surveys")
@@ -45,6 +47,11 @@ public class SurveyController {
     @GetMapping("/{id}")
     public ResponseEntity<SurveyDTO> getSurveyById(@PathVariable Long id) {
         return ResponseEntity.ok(surveyService.getSurveyById(id));
+    }
+
+    @GetMapping("/{id}/answers")
+    public ResponseEntity<Map<Long, LocalDateTime>> getSurveyAnswerState(@PathVariable Long id) {
+        return ResponseEntity.ok(surveyService.getSurveyAnswerState(id));
     }
 
     @GetMapping("/token/{token}")

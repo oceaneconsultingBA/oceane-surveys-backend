@@ -32,7 +32,7 @@ public class RecipientService {
     }
 
     public RecipientDTO getRecipientById(long id) {
-        Recipient recipient = recipientRepository.findById(id) .orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + id));
+        Recipient recipient = recipientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + id));
         return surveyMapper.recipientToDto(recipient);
     }
 
