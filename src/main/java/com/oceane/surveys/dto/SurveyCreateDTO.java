@@ -4,11 +4,15 @@ import com.oceane.surveys.entities.SurveyStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SurveyCreateDTO {
@@ -22,44 +26,4 @@ public class SurveyCreateDTO {
 
     private List<QuestionDTO> questions = new ArrayList<>();
     private List<Long> recipientIds = new ArrayList<>();
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<QuestionDTO> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<QuestionDTO> questions) {
-        this.questions = questions;
-    }
-
-    public List<Long> getRecipientIds() {
-        return recipientIds;
-    }
-
-    public void setRecipientIds(List<Long> recipientIds) {
-        this.recipientIds = recipientIds;
-    }
-
-    public SurveyStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(SurveyStatus status) {
-        this.status = status;
-    }
 }

@@ -2,9 +2,12 @@ package com.oceane.surveys.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionOptionDTO {
@@ -14,28 +17,4 @@ public class QuestionOptionDTO {
     private String text;
 
     private int displayOrder;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public int getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public void setDisplayOrder(int displayOrder) {
-        this.displayOrder = displayOrder;
-    }
 }
