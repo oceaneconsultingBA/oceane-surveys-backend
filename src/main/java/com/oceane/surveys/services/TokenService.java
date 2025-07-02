@@ -64,7 +64,7 @@ public class TokenService {
      * Construit l'URL complète pour accéder à l'enquête avec le token
      */
     public String buildSurveyUrl(SurveyToken token) {
-        return surveyBaseUrl + token.getToken();
+        return surveyBaseUrl + "?token=" + token.getToken();
     }
 
     /**
