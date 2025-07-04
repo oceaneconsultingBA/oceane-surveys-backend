@@ -45,7 +45,7 @@ public class QuestionService {
             throw new IllegalStateException("Cannot add questions to a survey that is not in DRAFT status");
         }
 
-        Question question = surveyMapper.questionDtoToEntity(questionDTO);
+        Question question = surveyMapper.toEntity(questionDTO);
         question.setSurvey(survey);
 
         // Set display order if not provided
@@ -59,7 +59,7 @@ public class QuestionService {
         survey.setLastModifiedDate(LocalDateTime.now());
         surveyRepository.save(survey);
 
-        return surveyMapper.questionToDto(savedQuestion);
+        return surveyMapper.toDto(savedQuestion);
     }
 
     @Transactional
@@ -100,7 +100,7 @@ public class QuestionService {
         surveyRepository.save(survey);
 
         Question updatedQuestion = questionRepository.save(question);
-        return surveyMapper.questionToDto(updatedQuestion);
+        return surveyMapper.toDto(updatedQuestion);
     }
 
     @Transactional
@@ -123,7 +123,7 @@ public class QuestionService {
 
     public List<QuestionDTO> getQuestionsBySurvey(Long surveyId) {
         return questionRepository.findBySurvey_IdOrderByDisplayOrderAsc(surveyId).stream()
-                .map(surveyMapper::questionToDto)
+                .map(surveyMapper::toDto)
                 .toList();
     }
 }

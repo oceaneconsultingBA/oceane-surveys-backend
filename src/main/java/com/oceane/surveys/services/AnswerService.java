@@ -49,13 +49,13 @@ public class AnswerService {
 
     public List<AnswerDTO> getAnswersBySurvey(Long surveyId) {
         return answerRepository.findBySurvey_IdOrderByDisplayOrderAsc(surveyId).stream()
-                .map(surveyMapper::answerToDto)
+                .map(surveyMapper::toDto)
                 .toList();
     }
 
     public List<AnswerDTO> getAnswersBySurveyAndRecipient(Long surveyId, Long recipientId) {
         return answerRepository.findBySurvey_IdAndRecipient_IdOrderByDisplayOrderAsc(surveyId, recipientId).stream()
-                .map(surveyMapper::answerToDto)
+                .map(surveyMapper::toDto)
                 .toList();
     }
 
@@ -89,7 +89,7 @@ public class AnswerService {
             }
 
             Question question = questionRepository.findById(questionId).orElseThrow(() -> new ResourceNotFoundException("Question not found with id: " + questionId));
-            Answer answer = surveyMapper.answerDtoToEntity(answerDTO);
+            Answer answer = surveyMapper.toEntity(answerDTO);
             answer.setId(null);
             answer.setQuestion(question);
             answer.setRecipient(recipient);
@@ -101,7 +101,7 @@ public class AnswerService {
             }
 
             Answer savedAnswer = answerRepository.save(answer);
-            AnswerDTO savedAnswerDTO = surveyMapper.answerToDto(savedAnswer);
+            AnswerDTO savedAnswerDTO = surveyMapper.toDto(savedAnswer);
             savedAnswers.put(questionId, savedAnswerDTO);
         }
 

@@ -98,7 +98,7 @@ public class SurveyService {
         if (createDTO.getQuestions() != null && !createDTO.getQuestions().isEmpty()) {
             List<Question> questions = createDTO.getQuestions().stream()
                     .map(questionDTO -> {
-                        Question question = surveyMapper.questionDtoToEntity(questionDTO);
+                        Question question = surveyMapper.toEntity(questionDTO);
                         question.setSurvey(survey);
                         return question;
                     })
@@ -152,7 +152,7 @@ public class SurveyService {
         if (surveyDTO.getQuestions() != null) {
             log.info("{} question(s)", surveyDTO.getQuestions().size());
             surveyDTO.getQuestions().forEach(questionDTO -> {
-                Question question = surveyMapper.questionDtoToEntity(questionDTO);
+                Question question = surveyMapper.toEntity(questionDTO);
                 question.setSurvey(existingSurvey);
                 existingSurvey.getQuestions().add(question);
             });

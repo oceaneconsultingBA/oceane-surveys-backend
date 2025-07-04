@@ -28,12 +28,12 @@ public class RecipientService {
 
     public List<RecipientDTO> getAllRecipients() {
         List<Recipient> recipients = recipientRepository.findAll();
-        return recipients.stream().map(surveyMapper::recipientToDto).toList();
+        return recipients.stream().map(surveyMapper::toDto).toList();
     }
 
     public RecipientDTO getRecipientById(long id) {
         Recipient recipient = recipientRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Recipient not found with id: " + id));
-        return surveyMapper.recipientToDto(recipient);
+        return surveyMapper.toDto(recipient);
     }
 
     @Transactional
@@ -43,9 +43,9 @@ public class RecipientService {
             throw new IllegalStateException("Email already in use: " + recipientDTO.getEmail());
         }
 
-        Recipient recipient = surveyMapper.recipientDtoToEntity(recipientDTO);
+        Recipient recipient = surveyMapper.toEntity(recipientDTO);
         Recipient savedRecipient = recipientRepository.save(recipient);
-        return surveyMapper.recipientToDto(savedRecipient);
+        return surveyMapper.toDto(savedRecipient);
     }
 
     @Transactional
@@ -65,7 +65,7 @@ public class RecipientService {
         recipient.setType(recipientDTO.getType());
 
         Recipient updatedRecipient = recipientRepository.save(recipient);
-        return surveyMapper.recipientToDto(updatedRecipient);
+        return surveyMapper.toDto(updatedRecipient);
     }
 
     public void deleteRecipient(Long id) {
@@ -96,6 +96,6 @@ public class RecipientService {
     }
 
     public List<RecipientDTO> getRecipientsBySurvey(Long surveyId) {
-        return recipientRepository.findBySurveysId(surveyId).stream().map(surveyMapper::recipientToDto).toList();
+        return recipientRepository.findBySurveysId(surveyId).stream().map(surveyMapper::toDto).toList();
     }
 }
