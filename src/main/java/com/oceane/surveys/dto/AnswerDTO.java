@@ -20,6 +20,8 @@ public class AnswerDTO {
 
     private Long recipientId;
 
+    private QuestionDTO question;
+
     private String text;
 
     private Integer rating;

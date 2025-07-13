@@ -180,12 +180,17 @@ public class SurveyMapper {
     }
 
     public AnswerDTO toDto(Answer answer) {
+        if (answer == null) {
+            return null;
+        }
+
         AnswerDTO dto = new AnswerDTO();
         dto.setId(answer.getId());
         dto.setCreationDate(answer.getCreationDate());
         dto.setText(answer.getText());
         dto.setRating(answer.getRating());
         dto.setRecipientId(answer.getRecipient().getId());
+        dto.setQuestion(toDto(answer.getQuestion()));
 
         // Map options if not empty
         if (answer.getOptions() != null && !answer.getOptions().isEmpty()) {
@@ -199,6 +204,10 @@ public class SurveyMapper {
     }
 
     public Answer toEntity(AnswerDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
         Answer answer = new Answer();
         // Ne pas définir l'ID si c'est 0 ou null
         if (dto.getId() != null && dto.getId() != 0) {
